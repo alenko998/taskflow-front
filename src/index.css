@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Sora:wght@300;400;600&display=swap');
+
+:root {
+  /* Colors */
+  --bg:         #0F1117;
+  --surface:    #1A1D27;
+  --surface-2:  #222638;
+  --border:     #2A2D3E;
+  --border-2:   #363A52;
+
+  --acc:        #6C63FF;
+  --acc-hover:  #5A52E0;
+  --acc-light:  rgba(108,99,255,0.12);
+
+  --teal:       #00D4AA;
+  --teal-light: rgba(0,212,170,0.12);
+
+  --text:       #E8EAF0;
+  --text-2:     #9CA3AF;
+  --text-3:     #6B7280;
+
+  --danger:     #EF4444;
+  --danger-light: rgba(239,68,68,0.12);
+  --warning:    #F59E0B;
+  --warning-light: rgba(245,158,11,0.12);
+  --success:    #10B981;
+  --success-light: rgba(16,185,129,0.12);
+
+  /* Typography */
+  --fd: 'Sora', system-ui, sans-serif;
+  --fb: 'Inter', system-ui, sans-serif;
+
+  /* Spacing */
+  --radius:   8px;
+  --radius-sm: 4px;
+  --radius-lg: 12px;
+
+  /* Transitions */
+  --t: 0.2s ease;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--fb);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
+
+/* Selection */
+::selection { background: var(--acc-light); color: var(--text); }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
