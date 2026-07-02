@@ -1,0 +1,18 @@
+import Sidebar from "./Sidebar";
+
+export default function AppLayout({ children }) {
+  return (
+    <div style={{ display: "flex", minHeight: "100vh" }}>
+      <Sidebar />
+      <main style={{
+        flex: 1,
+        marginLeft: 240,
+        padding: "40px 48px",
+        minHeight: "100vh",
+        background: "var(--bg)",
+      }}>
+        {children}
+      </main>
+    </div>
+  );
+}
