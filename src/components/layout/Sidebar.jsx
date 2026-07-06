@@ -1,4 +1,5 @@
 import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import Avatar from "../ui/Avatar";
 
 const NAV_ITEMS = [
@@ -10,10 +11,13 @@ const NAV_ITEMS = [
 ];
 
 export default function Sidebar() {
-  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const navigate         = useNavigate();
 
-  // placeholder user
-  const user = { firstName: "Alen", lastName: "Smrkovic", email: "alen@taskflow.com" };
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   return (
     <aside style={{
@@ -35,22 +39,16 @@ export default function Sidebar() {
           background: "var(--acc)",
           display: "flex", alignItems: "center", justifyContent: "center",
           fontSize: "1rem", fontWeight: 700, color: "#fff",
-        }}>
-          T
-        </div>
+          fontFamily: "var(--fd)",
+        }}>T</div>
         <span style={{
           fontFamily: "var(--fd)", fontSize: "1.1rem",
           fontWeight: 600, color: "var(--text)",
-        }}>
-          TaskFlow
-        </span>
+        }}>TaskFlow</span>
       </div>
 
       {/* Workspace */}
-      <div style={{
-        padding: "12px 16px",
-        borderBottom: "1px solid var(--border)",
-      }}>
+      <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--border)" }}>
         <div style={{
           display: "flex", alignItems: "center", gap: 10,
           padding: "8px 10px", borderRadius: "var(--radius-sm)",
@@ -65,11 +63,11 @@ export default function Sidebar() {
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: ".8rem", color: "var(--teal)", fontWeight: 600,
           }}>
-            A
+            {user?.workspaceName?.[0] || "W"}
           </div>
           <div>
             <div style={{ fontSize: ".82rem", fontWeight: 500, color: "var(--text)" }}>
-              Acme Corp
+              {user?.workspaceName || "My Workspace"}
             </div>
             <div style={{ fontSize: ".7rem", color: "var(--text-3)" }}>Free plan</div>
           </div>
@@ -78,7 +76,7 @@ export default function Sidebar() {
       </div>
 
       {/* Nav */}
-      <nav style={{ flex: 1, padding: "12px 12px", display: "flex", flexDirection: "column", gap: 2 }}>
+      <nav style={{ flex: 1, padding: "12px", display: "flex", flexDirection: "column", gap: 2 }}>
         {NAV_ITEMS.map(({ path, icon, label }) => (
           <NavLink
             key={path}
@@ -89,15 +87,14 @@ export default function Sidebar() {
               fontSize: ".85rem", fontWeight: isActive ? 500 : 400,
               color: isActive ? "var(--acc)" : "var(--text-2)",
               background: isActive ? "var(--acc-light)" : "transparent",
-              textDecoration: "none",
-              transition: "all var(--t)",
+              textDecoration: "none", transition: "all var(--t)",
             })}
             onMouseEnter={e => {
-              if (!e.currentTarget.classList.contains("active"))
+              if (!e.currentTarget.getAttribute("aria-current"))
                 e.currentTarget.style.background = "var(--surface-2)";
             }}
             onMouseLeave={e => {
-              if (!e.currentTarget.classList.contains("active"))
+              if (!e.currentTarget.getAttribute("aria-current"))
                 e.currentTarget.style.background = "transparent";
             }}
           >
@@ -109,24 +106,41 @@ export default function Sidebar() {
 
       {/* User */}
       <div style={{
-        padding: "16px",
+        padding: "12px 16px",
         borderTop: "1px solid var(--border)",
-        display: "flex", alignItems: "center", gap: 10,
-        cursor: "pointer",
-      }}
-        onMouseEnter={e => e.currentTarget.style.background = "var(--surface-2)"}
-        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-      >
-        <Avatar name={`${user.firstName} ${user.lastName}`} size={32} />
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: ".82rem", fontWeight: 500, color: "var(--text)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-            {user.firstName} {user.lastName}
+      }}>
+        <div style={{
+          display: "flex", alignItems: "center", gap: 10,
+          padding: "8px 10px", borderRadius: "var(--radius-sm)",
+          cursor: "pointer", transition: "background var(--t)",
+        }}
+          onMouseEnter={e => e.currentTarget.style.background = "var(--surface-2)"}
+          onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+        >
+          <Avatar name={`${user?.firstName} ${user?.lastName}`} size={32} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: ".82rem", fontWeight: 500, color: "var(--text)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              {user?.firstName} {user?.lastName}
+            </div>
+            <div style={{ fontSize: ".72rem", color: "var(--text-3)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              {user?.email}
+            </div>
           </div>
-          <div style={{ fontSize: ".72rem", color: "var(--text-3)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-            {user.email}
-          </div>
+          <button
+            onClick={handleLogout}
+            title="Sign out"
+            style={{
+              background: "none", border: "none", cursor: "pointer",
+              color: "var(--text-3)", fontSize: ".9rem", padding: 4,
+              borderRadius: "var(--radius-sm)", transition: "color var(--t)",
+              flexShrink: 0,
+            }}
+            onMouseEnter={e => e.currentTarget.style.color = "var(--danger)"}
+            onMouseLeave={e => e.currentTarget.style.color = "var(--text-3)"}
+          >
+            ↩
+          </button>
         </div>
-        <span style={{ color: "var(--text-3)", fontSize: ".8rem" }}>↩</span>
       </div>
     </aside>
   );

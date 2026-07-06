@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Input, Button } from "../components/ui";
+import { useAuth } from "../context/AuthContext";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -11,6 +12,7 @@ export default function RegisterPage() {
     firstName: "", lastName: "", email: "",
     password: "", confirmPassword: "", workspaceName: "",
   });
+  const { register } = useAuth();
 
   const handle = k => e => setForm(p => ({ ...p, [k]: e.target.value }));
 
@@ -29,20 +31,22 @@ export default function RegisterPage() {
     setStep(3);
   };
 
-  const handleStep3 = async () => {
-    if (!form.workspaceName) { setError("Please enter a workspace name."); return; }
-    setLoading(true);
-    setError("");
-    try {
-      // TODO: connect to API
-      await new Promise(r => setTimeout(r, 900));
-      navigate("/dashboard");
-    } catch {
-      setError("Registration failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+
+
+
+const handleStep3 = async () => {
+  if (!form.workspaceName) { setError("Please enter a workspace name."); return; }
+  setLoading(true);
+  setError("");
+  try {
+    await register(form);
+    navigate("/dashboard");
+  } catch {
+    setError("Registration failed. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div style={{

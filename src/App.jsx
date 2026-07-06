@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "./context/AuthContext";
 import AppLayout from "./components/layout/AppLayout";
 import DashboardPage from "./pages/DashboardPage";
 import ProjectsPage from "./pages/ProjectsPage";
@@ -9,32 +10,41 @@ import SettingsPage from "./pages/SettingsPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 
-export default function App() {
-  // placeholder — later from AuthContext
-  const isLoggedIn = true;
+function ProtectedRoute({ children }) {
+  const { user } = useAuth();
+  return user ? children : <Navigate to="/login" />;
+}
 
-  if (!isLoggedIn) {
-    return (
-      <Routes>
-        <Route path="/login"    element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="*"         element={<Navigate to="/login" />} />
-      </Routes>
-    );
-  }
+export default function App() {
+  const { user } = useAuth();
 
   return (
     <Routes>
-      <Route path="/"                 element={<Navigate to="/dashboard" />} />
-      <Route path="/dashboard"        element={<AppLayout><DashboardPage /></AppLayout>} />
-      <Route path="/projects"         element={<AppLayout><ProjectsPage /></AppLayout>} />
-      <Route path="/projects/:id"     element={<AppLayout><ProjectDetailPage /></AppLayout>} />
-      <Route path="/my-tasks"         element={<AppLayout><MyTasksPage /></AppLayout>} />
-      <Route path="/members"          element={<AppLayout><MembersPage /></AppLayout>} />
-      <Route path="/settings"         element={<AppLayout><SettingsPage /></AppLayout>} />
-      <Route path="/login"            element={<LoginPage />} />
-      <Route path="/register"         element={<RegisterPage />} />
-      <Route path="*"                 element={<Navigate to="/dashboard" />} />
+      <Route path="/login"    element={user ? <Navigate to="/dashboard" /> : <LoginPage />} />
+      <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <RegisterPage />} />
+
+      <Route path="/" element={<ProtectedRoute><Navigate to="/dashboard" /></ProtectedRoute>} />
+
+      <Route path="/dashboard" element={
+        <ProtectedRoute><AppLayout><DashboardPage /></AppLayout></ProtectedRoute>
+      } />
+      <Route path="/projects" element={
+        <ProtectedRoute><AppLayout><ProjectsPage /></AppLayout></ProtectedRoute>
+      } />
+      <Route path="/projects/:id" element={
+        <ProtectedRoute><AppLayout><ProjectDetailPage /></AppLayout></ProtectedRoute>
+      } />
+      <Route path="/my-tasks" element={
+        <ProtectedRoute><AppLayout><MyTasksPage /></AppLayout></ProtectedRoute>
+      } />
+      <Route path="/members" element={
+        <ProtectedRoute><AppLayout><MembersPage /></AppLayout></ProtectedRoute>
+      } />
+      <Route path="/settings" element={
+        <ProtectedRoute><AppLayout><SettingsPage /></AppLayout></ProtectedRoute>
+      } />
+
+      <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} />} />
     </Routes>
   );
 }

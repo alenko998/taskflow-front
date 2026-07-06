@@ -1,29 +1,33 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Input, Button } from "../components/ui";
+import { useAuth } from "../context/AuthContext";
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState("");
   const [form, setForm]       = useState({ email: "", password: "" });
+  const { login } = useAuth();
 
   const handle = k => e => setForm(p => ({ ...p, [k]: e.target.value }));
 
-  const handleSubmit = async () => {
-    if (!form.email || !form.password) { setError("Please fill in all fields."); return; }
-    setLoading(true);
-    setError("");
-    try {
-      // TODO: connect to API
-      await new Promise(r => setTimeout(r, 800));
-      navigate("/dashboard");
-    } catch {
-      setError("Invalid email or password.");
-    } finally {
-      setLoading(false);
-    }
-  };
+
+
+
+const handleSubmit = async () => {
+  if (!form.email || !form.password) { setError("Please fill in all fields."); return; }
+  setLoading(true);
+  setError("");
+  try {
+    await login({ email: form.email, password: form.password });
+    navigate("/dashboard");
+  } catch {
+    setError("Invalid email or password.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div style={{
