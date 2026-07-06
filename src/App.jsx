@@ -3,11 +3,11 @@ import AppLayout from "./components/layout/AppLayout";
 import DashboardPage from "./pages/DashboardPage";
 import ProjectsPage from "./pages/ProjectsPage";
 import ProjectDetailPage from "./pages/ProjectDetailPage";
+import MyTasksPage from "./pages/MyTasksPage";
 import MembersPage from "./pages/MembersPage";
 import SettingsPage from "./pages/SettingsPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
-import MyTasksPage from "./pages/MyTasksPage";
 
 export default function App() {
   // placeholder — later from AuthContext
@@ -25,13 +25,15 @@ export default function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/dashboard" />} />
+      <Route path="/"                 element={<Navigate to="/dashboard" />} />
       <Route path="/dashboard"        element={<AppLayout><DashboardPage /></AppLayout>} />
       <Route path="/projects"         element={<AppLayout><ProjectsPage /></AppLayout>} />
       <Route path="/projects/:id"     element={<AppLayout><ProjectDetailPage /></AppLayout>} />
       <Route path="/my-tasks"         element={<AppLayout><MyTasksPage /></AppLayout>} />
       <Route path="/members"          element={<AppLayout><MembersPage /></AppLayout>} />
       <Route path="/settings"         element={<AppLayout><SettingsPage /></AppLayout>} />
+      <Route path="/login"            element={<LoginPage />} />
+      <Route path="/register"         element={<RegisterPage />} />
       <Route path="*"                 element={<Navigate to="/dashboard" />} />
     </Routes>
   );
