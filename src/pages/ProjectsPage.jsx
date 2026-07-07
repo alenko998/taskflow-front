@@ -1,51 +1,23 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import TopBar from "../components/layout/TopBar";
 import { Card, Badge, Avatar, Button, Modal, Input } from "../components/ui";
 
 const PROJECTS = [
-  {
-    id: 1, name: "Website Redesign", description: "Complete overhaul of the company website with new branding and improved UX.",
-    status: "Active", priority: "High", tasks: 12, completed: 8,
-    members: ["Alen S", "Sara M", "John D", "Amy K"],
-    deadline: "Jul 30, 2026", createdAt: "Jun 1, 2026",
-  },
-  {
-    id: 2, name: "Mobile App", description: "Cross-platform mobile application for iOS and Android using React Native.",
-    status: "Active", priority: "Critical", tasks: 24, completed: 10,
-    members: ["Alen S", "Mike R"],
-    deadline: "Aug 15, 2026", createdAt: "May 15, 2026",
-  },
-  {
-    id: 3, name: "Backend API", description: "RESTful API with .NET 10, Clean Architecture and PostgreSQL.",
-    status: "Completed", priority: "High", tasks: 8, completed: 8,
-    members: ["Sara M", "John D"],
-    deadline: "Jun 30, 2026", createdAt: "Apr 1, 2026",
-  },
-  {
-    id: 4, name: "Design System", description: "Component library and design tokens for all products.",
-    status: "On Hold", priority: "Medium", tasks: 16, completed: 4,
-    members: ["Amy K", "Alen S"],
-    deadline: "Sep 1, 2026", createdAt: "Jun 10, 2026",
-  },
-  {
-    id: 5, name: "Analytics Dashboard", description: "Real-time analytics and reporting dashboard for business intelligence.",
-    status: "Active", priority: "Medium", tasks: 20, completed: 6,
-    members: ["Mike R", "John D", "Sara M"],
-    deadline: "Aug 30, 2026", createdAt: "Jun 20, 2026",
-  },
-  {
-    id: 6, name: "CI/CD Pipeline", description: "Automated deployment pipeline with GitHub Actions and Docker.",
-    status: "Active", priority: "Low", tasks: 6, completed: 2,
-    members: ["Alen S"],
-    deadline: "Jul 15, 2026", createdAt: "Jun 25, 2026",
-  },
+  { id: 1, name: "Website Redesign",     description: "Complete overhaul of the company website with new branding and improved UX.", status: "Active",    priority: "High",     tasks: 12, completed: 8,  members: ["Alen S", "Sara M", "John D", "Amy K"], deadline: "Jul 30, 2026", createdAt: "Jun 1, 2026" },
+  { id: 2, name: "Mobile App",           description: "Cross-platform mobile application for iOS and Android using React Native.",    status: "Active",    priority: "Critical", tasks: 24, completed: 10, members: ["Alen S", "Mike R"],                    deadline: "Aug 15, 2026", createdAt: "May 15, 2026" },
+  { id: 3, name: "Backend API",          description: "RESTful API with .NET 10, Clean Architecture and PostgreSQL.",                status: "Completed", priority: "High",     tasks: 8,  completed: 8,  members: ["Sara M", "John D"],                    deadline: "Jun 30, 2026", createdAt: "Apr 1, 2026" },
+  { id: 4, name: "Design System",        description: "Component library and design tokens for all products.",                       status: "On Hold",   priority: "Medium",   tasks: 16, completed: 4,  members: ["Amy K", "Alen S"],                     deadline: "Sep 1, 2026",  createdAt: "Jun 10, 2026" },
+  { id: 5, name: "Analytics Dashboard",  description: "Real-time analytics and reporting dashboard for business intelligence.",      status: "Active",    priority: "Medium",   tasks: 20, completed: 6,  members: ["Mike R", "John D", "Sara M"],           deadline: "Aug 30, 2026", createdAt: "Jun 20, 2026" },
+  { id: 6, name: "CI/CD Pipeline",       description: "Automated deployment pipeline with GitHub Actions and Docker.",               status: "Active",    priority: "Low",      tasks: 6,  completed: 2,  members: ["Alen S"],                              deadline: "Jul 15, 2026", createdAt: "Jun 25, 2026" },
 ];
 
-const STATUS_COLORS  = { Active: "accent", Completed: "success", "On Hold": "warning" };
+const STATUS_COLORS   = { Active: "accent", Completed: "success", "On Hold": "warning" };
 const PRIORITY_COLORS = { Low: "default", Medium: "warning", High: "danger", Critical: "danger" };
-const STATUS_FILTERS = ["All", "Active", "Completed", "On Hold"];
+const STATUS_FILTERS  = ["All", "Active", "Completed", "On Hold"];
 
 export default function ProjectsPage() {
+  const navigate = useNavigate();
   const [filter, setFilter]       = useState("All");
   const [search, setSearch]       = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -95,8 +67,13 @@ export default function ProjectsPage() {
         {filtered.map(p => {
           const pct = Math.round((p.completed / p.tasks) * 100);
           return (
-            <Card key={p.id} hover padding="22px" style={{ cursor: "pointer", display: "flex", flexDirection: "column", gap: 16 }}>
-              {/* Header */}
+            <Card
+              key={p.id}
+              hover
+              padding="22px"
+              onClick={() => navigate(`/projects/${p.id}`)}
+              style={{ cursor: "pointer", display: "flex", flexDirection: "column", gap: 16 }}
+            >
               <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
                 <div>
                   <div style={{ fontSize: ".95rem", fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>{p.name}</div>
@@ -105,13 +82,13 @@ export default function ProjectsPage() {
                     <Badge variant={PRIORITY_COLORS[p.priority]} size="sm">{p.priority}</Badge>
                   </div>
                 </div>
-                <button style={{
-                  background: "none", border: "none", color: "var(--text-3)",
-                  cursor: "pointer", fontSize: "1.1rem", padding: 4,
-                }}>⋯</button>
+                <button
+                  onClick={e => e.stopPropagation()}
+                  style={{ background: "none", border: "none", color: "var(--text-3)", cursor: "pointer", fontSize: "1.1rem", padding: 4 }}>
+                  ⋯
+                </button>
               </div>
 
-              {/* Description */}
               <p style={{
                 fontSize: ".82rem", color: "var(--text-2)", lineHeight: 1.6,
                 display: "-webkit-box", WebkitLineClamp: 2,
@@ -120,7 +97,6 @@ export default function ProjectsPage() {
                 {p.description}
               </p>
 
-              {/* Progress */}
               <div>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
                   <span style={{ fontSize: ".75rem", color: "var(--text-3)" }}>{p.completed}/{p.tasks} tasks</span>
@@ -135,7 +111,6 @@ export default function ProjectsPage() {
                 </div>
               </div>
 
-              {/* Footer */}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div style={{ display: "flex" }}>
                   {p.members.slice(0, 4).map((m, i) => (
@@ -167,7 +142,6 @@ export default function ProjectsPage() {
         </div>
       )}
 
-      {/* New Project Modal */}
       <Modal
         open={showModal}
         onClose={() => setShowModal(false)}
@@ -182,9 +156,7 @@ export default function ProjectsPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <Input label="Project Name" placeholder="e.g. Website Redesign" />
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            <label style={{ fontSize: ".75rem", fontWeight: 500, letterSpacing: ".04em", textTransform: "uppercase", color: "var(--text-2)" }}>
-              Description
-            </label>
+            <label style={{ fontSize: ".75rem", fontWeight: 500, letterSpacing: ".04em", textTransform: "uppercase", color: "var(--text-2)" }}>Description</label>
             <textarea placeholder="What is this project about?" style={{
               background: "var(--surface-2)", border: "1px solid var(--border-2)",
               borderRadius: "var(--radius-sm)", color: "var(--text)",
@@ -202,7 +174,7 @@ export default function ProjectsPage() {
               }}>
                 <option>Low</option>
                 <option>Medium</option>
-                <option selected>High</option>
+                <option>High</option>
                 <option>Critical</option>
               </select>
             </div>
