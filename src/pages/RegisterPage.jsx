@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Input, Button } from "../components/ui";
 import { useAuth } from "../context/AuthContext";
+import { Input, Button } from "../components/ui";
 
 export default function RegisterPage() {
-  const navigate = useNavigate();
+  const navigate         = useNavigate();
+  const { register }     = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState("");
   const [step, setStep]       = useState(1);
@@ -12,7 +13,6 @@ export default function RegisterPage() {
     firstName: "", lastName: "", email: "",
     password: "", confirmPassword: "", workspaceName: "",
   });
-  const { register } = useAuth();
 
   const handle = k => e => setForm(p => ({ ...p, [k]: e.target.value }));
 
@@ -31,22 +31,19 @@ export default function RegisterPage() {
     setStep(3);
   };
 
-
-
-
-const handleStep3 = async () => {
-  if (!form.workspaceName) { setError("Please enter a workspace name."); return; }
-  setLoading(true);
-  setError("");
-  try {
-    await register(form);
-    navigate("/dashboard");
-  } catch {
-    setError("Registration failed. Please try again.");
-  } finally {
-    setLoading(false);
-  }
-};
+  const handleStep3 = async () => {
+    if (!form.workspaceName) { setError("Please enter a workspace name."); return; }
+    setLoading(true);
+    setError("");
+    try {
+      await register(form);
+      setStep(4);
+    } catch (err) {
+      setError(err.response?.data?.message || "Registration failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div style={{
@@ -66,44 +63,48 @@ const handleStep3 = async () => {
           </span>
         </div>
 
-        {/* Step indicator */}
-        <div style={{ display: "flex", alignItems: "center", gap: 0, marginBottom: 36 }}>
-          {[1, 2, 3].map((s, i) => (
-            <div key={s} style={{ display: "flex", alignItems: "center", flex: i < 2 ? 1 : "auto" }}>
-              <div style={{
-                width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: ".75rem", fontWeight: 600,
-                background: step >= s ? "var(--acc)" : "var(--surface-2)",
-                color: step >= s ? "#fff" : "var(--text-3)",
-                border: `1.5px solid ${step >= s ? "var(--acc)" : "var(--border-2)"}`,
-                transition: "all var(--t)",
-              }}>
-                {step > s ? "✓" : s}
-              </div>
-              {i < 2 && (
-                <div style={{
-                  flex: 1, height: 1.5, marginLeft: 0,
-                  background: step > s ? "var(--acc)" : "var(--border)",
-                  transition: "background var(--t)",
-                }} />
-              )}
+        {step < 4 && (
+          <>
+            {/* Step indicator */}
+            <div style={{ display: "flex", alignItems: "center", gap: 0, marginBottom: 36 }}>
+              {[1, 2, 3].map((s, i) => (
+                <div key={s} style={{ display: "flex", alignItems: "center", flex: i < 2 ? 1 : "auto" }}>
+                  <div style={{
+                    width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: ".75rem", fontWeight: 600,
+                    background: step >= s ? "var(--acc)" : "var(--surface-2)",
+                    color: step >= s ? "#fff" : "var(--text-3)",
+                    border: `1.5px solid ${step >= s ? "var(--acc)" : "var(--border-2)"}`,
+                    transition: "all var(--t)",
+                  }}>
+                    {step > s ? "✓" : s}
+                  </div>
+                  {i < 2 && (
+                    <div style={{
+                      flex: 1, height: 1.5,
+                      background: step > s ? "var(--acc)" : "var(--border)",
+                      transition: "background var(--t)",
+                    }} />
+                  )}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        {/* Step labels */}
-        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 32 }}>
-          {["Your info", "Password", "Workspace"].map((label, i) => (
-            <span key={label} style={{
-              fontSize: ".72rem", fontWeight: step === i + 1 ? 600 : 400,
-              color: step === i + 1 ? "var(--text)" : "var(--text-3)",
-              transition: "color var(--t)",
-            }}>
-              {label}
-            </span>
-          ))}
-        </div>
+            {/* Step labels */}
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 32 }}>
+              {["Your info", "Password", "Workspace"].map((label, i) => (
+                <span key={label} style={{
+                  fontSize: ".72rem", fontWeight: step === i + 1 ? 600 : 400,
+                  color: step === i + 1 ? "var(--text)" : "var(--text-3)",
+                  transition: "color var(--t)",
+                }}>
+                  {label}
+                </span>
+              ))}
+            </div>
+          </>
+        )}
 
         {/* Card */}
         <div style={{
@@ -121,7 +122,7 @@ const handleStep3 = async () => {
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                   <Input label="First Name" placeholder="Alen" value={form.firstName} onChange={handle("firstName")} />
-                  <Input label="Last Name"  placeholder="Smrkovic" value={form.lastName}  onChange={handle("lastName")} />
+                  <Input label="Last Name"  placeholder="Smrkovic" value={form.lastName} onChange={handle("lastName")} />
                 </div>
                 <Input label="Email" type="email" placeholder="you@company.com" value={form.email} onChange={handle("email")} />
                 {error && <p style={{ fontSize: ".78rem", color: "var(--danger)" }}>{error}</p>}
@@ -139,9 +140,10 @@ const handleStep3 = async () => {
                 Choose a strong password for your account.
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                <Input label="Password" type="password" placeholder="••••••••" value={form.password} onChange={handle("password")}
-                  hint="At least 6 characters" />
-                <Input label="Confirm Password" type="password" placeholder="••••••••" value={form.confirmPassword} onChange={handle("confirmPassword")} />
+                <Input label="Password" type="password" placeholder="••••••••"
+                  value={form.password} onChange={handle("password")} hint="At least 6 characters" />
+                <Input label="Confirm Password" type="password" placeholder="••••••••"
+                  value={form.confirmPassword} onChange={handle("confirmPassword")} />
                 {error && <p style={{ fontSize: ".78rem", color: "var(--danger)" }}>{error}</p>}
                 <div style={{ display: "flex", gap: 10 }}>
                   <Button variant="secondary" fullWidth onClick={() => { setStep(1); setError(""); }}>← Back</Button>
@@ -161,10 +163,8 @@ const handleStep3 = async () => {
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                 <Input
-                  label="Workspace Name"
-                  placeholder="Acme Corp"
-                  value={form.workspaceName}
-                  onChange={handle("workspaceName")}
+                  label="Workspace Name" placeholder="Acme Corp"
+                  value={form.workspaceName} onChange={handle("workspaceName")}
                   hint="This will be the name of your team's workspace."
                 />
                 {error && <p style={{ fontSize: ".78rem", color: "var(--danger)" }}>{error}</p>}
@@ -175,14 +175,37 @@ const handleStep3 = async () => {
               </div>
             </>
           )}
+
+          {step === 4 && (
+            <>
+              <div style={{ textAlign: "center", padding: "16px 0" }}>
+                <div style={{
+                  width: 56, height: 56, borderRadius: "50%",
+                  background: "var(--success-light)", border: "1px solid rgba(16,185,129,.2)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: "1.5rem", margin: "0 auto 20px",
+                }}>✓</div>
+                <h2 style={{ fontFamily: "var(--fd)", fontSize: "1.5rem", fontWeight: 600, color: "var(--text)", marginBottom: 8 }}>
+                  Check your email!
+                </h2>
+                <p style={{ fontSize: ".85rem", color: "var(--text-3)", lineHeight: 1.7, marginBottom: 24 }}>
+                  We sent a verification link to <strong style={{ color: "var(--text)" }}>{form.email}</strong>.
+                  Click the link to activate your account.
+                </p>
+                <Button fullWidth onClick={() => navigate("/login")}>Go to Sign in</Button>
+              </div>
+            </>
+          )}
         </div>
 
-        <p style={{ textAlign: "center", fontSize: ".82rem", color: "var(--text-3)", marginTop: 20 }}>
-          Already have an account?{" "}
-          <Link to="/login" style={{ color: "var(--acc)", textDecoration: "none", fontWeight: 500 }}>
-            Sign in
-          </Link>
-        </p>
+        {step < 4 && (
+          <p style={{ textAlign: "center", fontSize: ".82rem", color: "var(--text-3)", marginTop: 20 }}>
+            Already have an account?{" "}
+            <Link to="/login" style={{ color: "var(--acc)", textDecoration: "none", fontWeight: 500 }}>
+              Sign in
+            </Link>
+          </p>
+        )}
       </div>
     </div>
   );

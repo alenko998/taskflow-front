@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from "react";
+import { login as loginApi, register as registerApi } from "../api/auth";
 
 const AuthContext = createContext(null);
 
@@ -8,43 +9,23 @@ export function AuthProvider({ children }) {
     return stored ? JSON.parse(stored) : null;
   });
 
-  const login = async (credentials) => {
-    // TODO: replace with real API call
-    const mockUser = {
-      id:            "1",
-      firstName:     "Alen",
-      lastName:      "Smrkovic",
-      email:         credentials.email,
-      role:          "Owner",
-      workspaceName: "Acme Corp",
-      token:         "mock-jwt-token",
-    };
-    localStorage.setItem("tf_user", JSON.stringify(mockUser));
-    localStorage.setItem("tf_token", mockUser.token);
-    setUser(mockUser);
-    return mockUser;
+  const login = async (data) => {
+    const res = await loginApi(data);
+    const userData = res.data;
+    localStorage.setItem("tf_token", userData.token);
+    localStorage.setItem("tf_user", JSON.stringify(userData));
+    setUser(userData);
+    return userData;
   };
 
   const register = async (data) => {
-    // TODO: replace with real API call
-    const mockUser = {
-      id:            "1",
-      firstName:     data.firstName,
-      lastName:      data.lastName,
-      email:         data.email,
-      role:          "Owner",
-      workspaceName: data.workspaceName,
-      token:         "mock-jwt-token",
-    };
-    localStorage.setItem("tf_user", JSON.stringify(mockUser));
-    localStorage.setItem("tf_token", mockUser.token);
-    setUser(mockUser);
-    return mockUser;
+    const res = await registerApi(data);
+    return res.data;
   };
 
   const logout = () => {
-    localStorage.removeItem("tf_user");
     localStorage.removeItem("tf_token");
+    localStorage.removeItem("tf_user");
     setUser(null);
   };
 

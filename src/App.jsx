@@ -9,6 +9,7 @@ import MembersPage from "./pages/MembersPage";
 import SettingsPage from "./pages/SettingsPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import AcceptInvitationPage from "./pages/AcceptInvitationPage";
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth();
@@ -45,6 +46,7 @@ export default function App() {
       } />
 
       <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} />} />
+      <Route path="/accept-invitation" element={<AcceptInvitationPage />} />
     </Routes>
   );
 }
