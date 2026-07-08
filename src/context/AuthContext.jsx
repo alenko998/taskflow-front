@@ -9,8 +9,12 @@ export function AuthProvider({ children }) {
     return stored ? JSON.parse(stored) : null;
   });
 
+  const updateUser = (newUser) => {
+    setUser(newUser);
+  };
+
   const login = async (data) => {
-    const res = await loginApi(data);
+    const res      = await loginApi(data);
     const userData = res.data;
     localStorage.setItem("tf_token", userData.token);
     localStorage.setItem("tf_user", JSON.stringify(userData));
@@ -30,7 +34,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout }}>
+    <AuthContext.Provider value={{ user, login, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

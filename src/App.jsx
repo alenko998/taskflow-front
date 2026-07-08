@@ -10,6 +10,8 @@ import SettingsPage from "./pages/SettingsPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import AcceptInvitationPage from "./pages/AcceptInvitationPage";
+import CreateWorkspacePage from "./pages/CreateWorkspacePage";
+
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth();
@@ -44,6 +46,8 @@ export default function App() {
       <Route path="/settings" element={
         <ProtectedRoute><AppLayout><SettingsPage /></AppLayout></ProtectedRoute>
       } />
+
+      <Route path="/create-workspace" element={<CreateWorkspacePage />} />
 
       <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} />} />
       <Route path="/accept-invitation" element={<AcceptInvitationPage />} />

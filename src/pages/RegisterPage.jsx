@@ -9,9 +9,10 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState("");
   const [step, setStep]       = useState(1);
+  const [success, setSuccess] = useState(false);
   const [form, setForm]       = useState({
     firstName: "", lastName: "", email: "",
-    password: "", confirmPassword: "", workspaceName: "",
+    password: "", confirmPassword: "",
   });
 
   const handle = k => e => setForm(p => ({ ...p, [k]: e.target.value }));
@@ -23,21 +24,15 @@ export default function RegisterPage() {
     setStep(2);
   };
 
-  const handleStep2 = () => {
+  const handleStep2 = async () => {
     if (!form.password || !form.confirmPassword) { setError("Please fill in all fields."); return; }
     if (form.password.length < 6) { setError("Password must be at least 6 characters."); return; }
     if (form.password !== form.confirmPassword) { setError("Passwords do not match."); return; }
-    setError("");
-    setStep(3);
-  };
-
-  const handleStep3 = async () => {
-    if (!form.workspaceName) { setError("Please enter a workspace name."); return; }
     setLoading(true);
     setError("");
     try {
       await register(form);
-      setStep(4);
+      setSuccess(true);
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed.");
     } finally {
@@ -63,12 +58,12 @@ export default function RegisterPage() {
           </span>
         </div>
 
-        {step < 4 && (
+        {!success && (
           <>
             {/* Step indicator */}
-            <div style={{ display: "flex", alignItems: "center", gap: 0, marginBottom: 36 }}>
-              {[1, 2, 3].map((s, i) => (
-                <div key={s} style={{ display: "flex", alignItems: "center", flex: i < 2 ? 1 : "auto" }}>
+            <div style={{ display: "flex", alignItems: "center", marginBottom: 36 }}>
+              {[1, 2].map((s, i) => (
+                <div key={s} style={{ display: "flex", alignItems: "center", flex: i < 1 ? 1 : "auto" }}>
                   <div style={{
                     width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
                     display: "flex", alignItems: "center", justifyContent: "center",
@@ -80,7 +75,7 @@ export default function RegisterPage() {
                   }}>
                     {step > s ? "✓" : s}
                   </div>
-                  {i < 2 && (
+                  {i < 1 && (
                     <div style={{
                       flex: 1, height: 1.5,
                       background: step > s ? "var(--acc)" : "var(--border)",
@@ -91,13 +86,11 @@ export default function RegisterPage() {
               ))}
             </div>
 
-            {/* Step labels */}
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 32 }}>
-              {["Your info", "Password", "Workspace"].map((label, i) => (
+              {["Your info", "Password"].map((label, i) => (
                 <span key={label} style={{
                   fontSize: ".72rem", fontWeight: step === i + 1 ? 600 : 400,
                   color: step === i + 1 ? "var(--text)" : "var(--text-3)",
-                  transition: "color var(--t)",
                 }}>
                   {label}
                 </span>
@@ -106,12 +99,11 @@ export default function RegisterPage() {
           </>
         )}
 
-        {/* Card */}
         <div style={{
           background: "var(--surface)", border: "1px solid var(--border)",
           borderRadius: "var(--radius-lg)", padding: "32px",
         }}>
-          {step === 1 && (
+          {step === 1 && !success && (
             <>
               <h2 style={{ fontFamily: "var(--fd)", fontSize: "1.5rem", fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>
                 Create your account
@@ -131,7 +123,7 @@ export default function RegisterPage() {
             </>
           )}
 
-          {step === 2 && (
+          {step === 2 && !success && (
             <>
               <h2 style={{ fontFamily: "var(--fd)", fontSize: "1.5rem", fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>
                 Set your password
@@ -147,58 +139,33 @@ export default function RegisterPage() {
                 {error && <p style={{ fontSize: ".78rem", color: "var(--danger)" }}>{error}</p>}
                 <div style={{ display: "flex", gap: 10 }}>
                   <Button variant="secondary" fullWidth onClick={() => { setStep(1); setError(""); }}>← Back</Button>
-                  <Button fullWidth size="lg" onClick={handleStep2}>Continue →</Button>
+                  <Button fullWidth size="lg" loading={loading} onClick={handleStep2}>Create Account</Button>
                 </div>
               </div>
             </>
           )}
 
-          {step === 3 && (
-            <>
-              <h2 style={{ fontFamily: "var(--fd)", fontSize: "1.5rem", fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>
-                Create your workspace
+          {success && (
+            <div style={{ textAlign: "center", padding: "16px 0" }}>
+              <div style={{
+                width: 56, height: 56, borderRadius: "50%",
+                background: "var(--success-light)", border: "1px solid rgba(16,185,129,.2)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: "1.5rem", margin: "0 auto 20px",
+              }}>✓</div>
+              <h2 style={{ fontFamily: "var(--fd)", fontSize: "1.5rem", fontWeight: 600, color: "var(--text)", marginBottom: 8 }}>
+                Check your email!
               </h2>
-              <p style={{ fontSize: ".82rem", color: "var(--text-3)", marginBottom: 24 }}>
-                A workspace is where you and your team collaborate.
+              <p style={{ fontSize: ".85rem", color: "var(--text-3)", lineHeight: 1.7, marginBottom: 24 }}>
+                We sent a verification link to <strong style={{ color: "var(--text)" }}>{form.email}</strong>.
+                Click the link to activate your account, then sign in.
               </p>
-              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                <Input
-                  label="Workspace Name" placeholder="Acme Corp"
-                  value={form.workspaceName} onChange={handle("workspaceName")}
-                  hint="This will be the name of your team's workspace."
-                />
-                {error && <p style={{ fontSize: ".78rem", color: "var(--danger)" }}>{error}</p>}
-                <div style={{ display: "flex", gap: 10 }}>
-                  <Button variant="secondary" fullWidth onClick={() => { setStep(2); setError(""); }}>← Back</Button>
-                  <Button fullWidth size="lg" loading={loading} onClick={handleStep3}>Create Account</Button>
-                </div>
-              </div>
-            </>
-          )}
-
-          {step === 4 && (
-            <>
-              <div style={{ textAlign: "center", padding: "16px 0" }}>
-                <div style={{
-                  width: 56, height: 56, borderRadius: "50%",
-                  background: "var(--success-light)", border: "1px solid rgba(16,185,129,.2)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: "1.5rem", margin: "0 auto 20px",
-                }}>✓</div>
-                <h2 style={{ fontFamily: "var(--fd)", fontSize: "1.5rem", fontWeight: 600, color: "var(--text)", marginBottom: 8 }}>
-                  Check your email!
-                </h2>
-                <p style={{ fontSize: ".85rem", color: "var(--text-3)", lineHeight: 1.7, marginBottom: 24 }}>
-                  We sent a verification link to <strong style={{ color: "var(--text)" }}>{form.email}</strong>.
-                  Click the link to activate your account.
-                </p>
-                <Button fullWidth onClick={() => navigate("/login")}>Go to Sign in</Button>
-              </div>
-            </>
+              <Button fullWidth onClick={() => navigate("/login")}>Go to Sign in</Button>
+            </div>
           )}
         </div>
 
-        {step < 4 && (
+        {!success && (
           <p style={{ textAlign: "center", fontSize: ".82rem", color: "var(--text-3)", marginTop: 20 }}>
             Already have an account?{" "}
             <Link to="/login" style={{ color: "var(--acc)", textDecoration: "none", fontWeight: 500 }}>

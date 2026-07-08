@@ -22,8 +22,8 @@ const handleSubmit = async () => {
   try {
     await login({ email: form.email, password: form.password });
     navigate("/dashboard");
-  } catch {
-    setError("Invalid email or password.");
+  } catch (err) {
+    setError(err.response?.data?.message || "Invalid email or password.");
   } finally {
     setLoading(false);
   }
