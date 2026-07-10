@@ -11,6 +11,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import AcceptInvitationPage from "./pages/AcceptInvitationPage";
 import CreateWorkspacePage from "./pages/CreateWorkspacePage";
+import VerifyEmailPage from "./pages/VerifyEmailPage";
 
 
 function ProtectedRoute({ children }) {
@@ -51,6 +52,7 @@ export default function App() {
 
       <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} />} />
       <Route path="/accept-invitation" element={<AcceptInvitationPage />} />
+      <Route path="/verify-email" element={<VerifyEmailPage />} />
     </Routes>
   );
 }
